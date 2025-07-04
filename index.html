@@ -7,8 +7,57 @@
 <body>
   <h1>Grille collaborative</h1>
   <div id="grid"></div>
+
+  <!-- Firebase SDKs classiques -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
-  <script src="script.js"></script>
+
+  <!-- Script principal -->
+  <script>
+    // Configuration Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDb-0IL0YmzQVnl-WX47xmoLTsAgVZQBVA",
+      authDomain: "pixelgrid-ebd32.firebaseapp.com",
+      databaseURL: "https://pixelgrid-ebd32-default-rtdb.firebaseio.com",
+      projectId: "pixelgrid-ebd32",
+      storageBucket: "pixelgrid-ebd32.appspot.com",
+      messagingSenderId: "137062804380",
+      appId: "1:137062804380:web:e2b42fXXXXX"
+    };
+
+    // Initialiser Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Créer la grille
+    const gridElement = document.getElementById("grid");
+    const size = 16; // 16x16
+
+    for (let y = 0; y < size; y++) {
+      const row = document.createElement("div");
+      row.classList.add("row");
+      for (let x = 0; x < size; x++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.x = x;
+        cell.dataset.y = y;
+        row.appendChild(cell);
+
+        const cellRef = db.ref(`pixels/${x}_${y}`);
+        cellRef.on("value", (snapshot) => {
+          const color = snapshot.val();
+          if (color) cell.style.backgroundColor = color;
+        });
+
+        cell.addEventListener("click", () => {
+          const color = prompt("Quelle couleur veux-tu mettre ?");
+          if (color) {
+            db.ref(`pixels/${x}_${y}`).set(color);
+          }
+        });
+      }
+      gridElement.appendChild(row);
+    }
+  </script>
 </body>
 </html>
