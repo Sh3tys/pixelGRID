@@ -3,85 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <title>Grille Collaborative</title>
-  <style>
-    /* Exemple minimal pour voir la grille */
-    #grid {
-      display: inline-block;
-      border: 1px solid #000;
-      user-select: none;
-    }
-    .row {
-      display: flex;
-    }
-    .cell {
-      width: 30px;
-      height: 30px;
-      border: 1px solid #ccc;
-      cursor: pointer;
-      background-color: white;
-      transition: background-color 0.3s;
-    }
-    .cell:hover {
-      opacity: 0.7;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="user-container">
+    <label for="username">Prénom obligatoire :</label>
+    <input type="text" id="username" placeholder="Ton prénom" />
+  </div>
+  
+  <div id="cooldown-timer" style="
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 16px;
+    z-index: 1000;
+    user-select: none;
+  ">
+    Cooldown : prêt
+  </div>
+
   <h1>Grille collaborative</h1>
   <div id="grid"></div>
 
-  <!-- Firebase SDK compat pour éviter les erreurs d’import -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
-  <script>
-    // Configuration Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDb-0IL0YmzQVnl-WX47xmoLTsAgVZQBVA",
-      authDomain: "pixelgrid-ebd32.firebaseapp.com",
-      databaseURL: "https://pixelgrid-ebd32-default-rtdb.firebaseio.com",
-      projectId: "pixelgrid-ebd32",
-      storageBucket: "pixelgrid-ebd32.appspot.com",
-      messagingSenderId: "137062804380",
-      appId: "1:137062804380:web:e2b42f18b2dd51170d7659"
-    };
-
-    // Initialiser Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // Création de la grille 16x16
-    const gridElement = document.getElementById("grid");
-    const size = 16;
-
-    for (let y = 0; y < size; y++) {
-      const row = document.createElement("div");
-      row.classList.add("row");
-
-      for (let x = 0; x < size; x++) {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.dataset.x = x;
-        cell.dataset.y = y;
-        row.appendChild(cell);
-
-        // Ecouter les changements de couleur dans Firebase
-        const cellRef = db.ref(`pixels/${x}_${y}`);
-        cellRef.on("value", (snapshot) => {
-          const color = snapshot.val();
-          cell.style.backgroundColor = color || "white";
-        });
-
-        // Au clic, demande une couleur et l’enregistre dans Firebase
-        cell.addEventListener("click", () => {
-          const color = prompt("Quelle couleur veux-tu mettre ? (ex: red, #00FF00, rgb(0,0,255))");
-          if (color) {
-            db.ref(`pixels/${x}_${y}`).set(color);
-          }
-        });
-      }
-      gridElement.appendChild(row);
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>

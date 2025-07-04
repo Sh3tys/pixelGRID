@@ -1,61 +1,131 @@
 // Configuration Firebase
- const firebaseConfig = {
-      apiKey: "AIzaSyDb-0IL0YmzQVnl-WX47xmoLTsAgVZQBVA",
-      authDomain: "pixelgrid-ebd32.firebaseapp.com",
-      databaseURL: "https://pixelgrid-ebd32-default-rtdb.firebaseio.com",
-      projectId: "pixelgrid-ebd32",
-      storageBucket: "pixelgrid-ebd32.firebasestorage.app",
-      messagingSenderId: "137062804380",
-      appId: "1:137062804380:web:e2b42f18b2dd51170d7659",
-      measurementId: "G-82E388FSSE"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyDb-0IL0YmzQVnl-WX47xmoLTsAgVZQBVA",
+  authDomain: "pixelgrid-ebd32.firebaseapp.com",
+  databaseURL: "https://pixelgrid-ebd32-default-rtdb.firebaseio.com",
+  projectId: "pixelgrid-ebd32",
+  storageBucket: "pixelgrid-ebd32.appspot.com",
+  messagingSenderId: "137062804380",
+  appId: "1:137062804380:web:e2b42f18b2dd51170d7659"
+};
 
+// Initialiser Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const gridSize = 20;
-const cooldown = 5 * 60 * 1000; // 5 minutes
-const lastClickKey = 'lastClickTime';
 
-const gridElement = document.getElementById('grid');
+const gridElement = document.getElementById("grid");
+const usernameInput = document.getElementById("username");
+const cooldownTimerElement = document.getElementById("cooldown-timer");
 
-// Génère la grille
-for (let y = 0; y < gridSize; y++) {
-  for (let x = 0; x < gridSize; x++) {
-    const div = document.createElement('div');
-    div.className = 'pixel';
-    div.dataset.x = x;
-    div.dataset.y = y;
+const cols = 120;
+const rows = 55;
+const cooldown = 5 * 60 * 1000; // 5 minutes en ms
 
-    div.addEventListener('click', () => {
-      const now = Date.now();
-      const lastClick = parseInt(localStorage.getItem(lastClickKey)) || 0;
-      if (now - lastClick < cooldown) {
-        alert("Attendez encore un peu !");
-        return;
-      }
+// Charger le prénom depuis localStorage si existant
+if (localStorage.getItem("username")) {
+  usernameInput.value = localStorage.getItem("username");
+}
 
-      const color = prompt("Choisissez une couleur (ex: red, #00ff00)");
-      if (!color) return;
+// Sauvegarder le prénom à chaque changement
+usernameInput.addEventListener("input", () => {
+  localStorage.setItem("username", usernameInput.value.trim());
+});
 
-      const ref = db.ref(`grid/${x}_${y}`);
-      ref.set(color);
-      localStorage.setItem(lastClickKey, now.toString());
-    });
+// Mise à jour affichage cooldown
+function updateCooldownDisplay() {
+  const lastPaint = localStorage.getItem("lastPaintTimestamp");
+  const now = Date.now();
 
-    gridElement.appendChild(div);
+  if (!lastPaint || now - lastPaint >= cooldown) {
+    cooldownTimerElement.textContent = "Cooldown : prêt";
+    return;
+  }
+
+  const diff = cooldown - (now - lastPaint);
+  const seconds = Math.ceil(diff / 1000);
+  if (seconds > 59) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    cooldownTimerElement.textContent = `Cooldown : ${minutes}m ${secs}s`;
+  } else {
+    cooldownTimerElement.textContent = `Cooldown : ${seconds}s`;
   }
 }
 
-// Écoute les changements en temps réel
-db.ref('grid').on('value', snapshot => {
-  const data = snapshot.val();
-  if (!data) return;
-  for (const key in data) {
-    const color = data[key];
-    const [x, y] = key.split('_');
-    const pixel = document.querySelector(`.pixel[data-x="${x}"][data-y="${y}"]`);
-    if (pixel) {
-      pixel.style.backgroundColor = color;
-    }
+// Met à jour toutes les secondes
+setInterval(updateCooldownDisplay, 1000);
+// Affiche immédiatement au chargement
+updateCooldownDisplay();
+
+for (let y = 0; y < rows; y++) {
+  const row = document.createElement("div");
+  row.classList.add("row");
+
+  for (let x = 0; x < cols; x++) {
+    const cell = document.createElement("div");
+    cell.classList.add("cell");
+    cell.dataset.x = x;
+    cell.dataset.y = y;
+    row.appendChild(cell);
+
+    // Références Firebase pour couleur et user
+    const cellRef = db.ref(`pixels/${x}_${y}`);
+
+    // Écouter les changements en temps réel
+    cellRef.on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.color) {
+        cell.style.backgroundColor = data.color;
+      } else {
+        cell.style.backgroundColor = "white";
+      }
+    });
+
+    // Clic sur la cellule
+    cell.addEventListener("click", () => {
+      const username = usernameInput.value.trim();
+
+      if (!username) {
+        alert("Merci de renseigner ton prénom avant de modifier un pixel.");
+        usernameInput.focus();
+        return;
+      }
+
+      const lastPaint = localStorage.getItem("lastPaintTimestamp");
+      const now = Date.now();
+
+      // Récupérer les données actuelles pour afficher le propriétaire actuel
+      cellRef.once("value").then((snapshot) => {
+        const data = snapshot.val();
+
+        if (data && data.color && data.user) {
+          alert(`Ce pixel est actuellement colorié en "${data.color}" par ${data.user}.`);
+        } else {
+          alert("Ce pixel est actuellement blanc (non colorié).");
+        }
+
+        // Vérifier cooldown et proposer recolorage uniquement si cooldown terminé
+        if (lastPaint && now - lastPaint < cooldown) {
+          const wait = Math.ceil((cooldown - (now - lastPaint)) / 1000);
+          alert(`Merci d'attendre ${wait} secondes avant de recolorer un pixel.`);
+          return;
+        }
+
+        // Demander nouvelle couleur
+        const newColor = prompt("Quelle couleur veux-tu mettre ? (ex: red, #00FF00, rgb(0,0,255))");
+
+        if (newColor) {
+          // Enregistrer dans Firebase
+          cellRef.set({
+            color: newColor,
+            user: username
+          });
+          // Mettre à jour cooldown localStorage
+          localStorage.setItem("lastPaintTimestamp", now);
+          updateCooldownDisplay(); // mise à jour immédiate du timer
+        }
+      });
+    });
   }
-});
+  gridElement.appendChild(row);
+}

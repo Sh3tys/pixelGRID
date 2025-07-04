@@ -1,11 +1,22 @@
 body {
-  font-family: sans-serif;
-  text-align: center;
+  display: flex;
+  flex-direction: column;   /* Colonne : titre en haut, grille en dessous */
+  align-items: center;      /* Centre horizontalement les enfants */
+  height: 100vh;
+  margin: 0;
+  user-select: none;
+  padding-top: 20px;        /* Petit espace en haut */
+  box-sizing: border-box;
+}
+
+h1 {
+  margin: 0 0 20px 0;       /* Marge sous le titre pour espacer */
 }
 
 #grid {
-  display: inline-block;
-  margin-top: 20px;
+  border: 1px solid #000;
+  user-select: none;
+  /* Pour que la grille soit centrée horizontalement, align-items sur body suffit */
 }
 
 .row {
@@ -13,8 +24,32 @@ body {
 }
 
 .cell {
-  width: 20px;
-  height: 20px;
+  width: 10px;
+  height: 10px;
   border: 1px solid #ccc;
   cursor: pointer;
+  background-color: white;
+  transition: background-color 0.3s;
+}
+
+.cell:hover {
+  opacity: 0.7;
+}
+
+#user-container {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #eee;
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+  user-select: none;
+  z-index: 1000;
+}
+
+#username {
+  padding: 4px 6px;
+  font-size: 14px;
+  width: 120px;
 }
