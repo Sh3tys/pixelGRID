@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <title>Grille Collaborative</title>
-  <link rel="stylesheet" href="style.css" />
   <style>
     /* Exemple minimal pour voir la grille */
     #grid {
       display: inline-block;
       border: 1px solid #000;
+      user-select: none;
     }
     .row {
       display: flex;
@@ -18,6 +18,11 @@
       height: 30px;
       border: 1px solid #ccc;
       cursor: pointer;
+      background-color: white;
+      transition: background-color 0.3s;
+    }
+    .cell:hover {
+      opacity: 0.7;
     }
   </style>
 </head>
@@ -25,7 +30,7 @@
   <h1>Grille collaborative</h1>
   <div id="grid"></div>
 
-  <!-- Firebase SDKs compat -->
+  <!-- Firebase SDK compat pour éviter les erreurs d’import -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
@@ -64,7 +69,7 @@
         const cellRef = db.ref(`pixels/${x}_${y}`);
         cellRef.on("value", (snapshot) => {
           const color = snapshot.val();
-          cell.style.backgroundColor = color || "white"; // blanc si pas de couleur
+          cell.style.backgroundColor = color || "white";
         });
 
         // Au clic, demande une couleur et l’enregistre dans Firebase
@@ -75,7 +80,6 @@
           }
         });
       }
-
       gridElement.appendChild(row);
     }
   </script>
