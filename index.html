@@ -1,18 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8" />
   <title>Grille Collaborative</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Exemple minimal pour voir la grille */
+    #grid {
+      display: inline-block;
+      border: 1px solid #000;
+    }
+    .row {
+      display: flex;
+    }
+    .cell {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <h1>Grille collaborative</h1>
   <div id="grid"></div>
 
-  <!-- Firebase SDKs classiques -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+  <!-- Firebase SDKs compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
-  <!-- Script principal -->
   <script>
     // Configuration Firebase
     const firebaseConfig = {
@@ -22,20 +38,21 @@
       projectId: "pixelgrid-ebd32",
       storageBucket: "pixelgrid-ebd32.appspot.com",
       messagingSenderId: "137062804380",
-      appId: "1:137062804380:web:e2b42fXXXXX"
+      appId: "1:137062804380:web:e2b42f18b2dd51170d7659"
     };
 
     // Initialiser Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Créer la grille
+    // Création de la grille 16x16
     const gridElement = document.getElementById("grid");
-    const size = 16; // 16x16
+    const size = 16;
 
     for (let y = 0; y < size; y++) {
       const row = document.createElement("div");
       row.classList.add("row");
+
       for (let x = 0; x < size; x++) {
         const cell = document.createElement("div");
         cell.classList.add("cell");
@@ -43,19 +60,22 @@
         cell.dataset.y = y;
         row.appendChild(cell);
 
+        // Ecouter les changements de couleur dans Firebase
         const cellRef = db.ref(`pixels/${x}_${y}`);
         cellRef.on("value", (snapshot) => {
           const color = snapshot.val();
-          if (color) cell.style.backgroundColor = color;
+          cell.style.backgroundColor = color || "white"; // blanc si pas de couleur
         });
 
+        // Au clic, demande une couleur et l’enregistre dans Firebase
         cell.addEventListener("click", () => {
-          const color = prompt("Quelle couleur veux-tu mettre ?");
+          const color = prompt("Quelle couleur veux-tu mettre ? (ex: red, #00FF00, rgb(0,0,255))");
           if (color) {
             db.ref(`pixels/${x}_${y}`).set(color);
           }
         });
       }
+
       gridElement.appendChild(row);
     }
   </script>

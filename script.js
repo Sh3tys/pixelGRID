@@ -1,13 +1,14 @@
 // Configuration Firebase
-const firebaseConfig = {
-  apiKey: "xxx",
-  authDomain: "xxx",
-  databaseURL: "https://xxx.firebaseio.com",
-  projectId: "xxx",
-  storageBucket: "xxx",
-  messagingSenderId: "xxx",
-  appId: "xxx"
-};
+ const firebaseConfig = {
+      apiKey: "AIzaSyDb-0IL0YmzQVnl-WX47xmoLTsAgVZQBVA",
+      authDomain: "pixelgrid-ebd32.firebaseapp.com",
+      databaseURL: "https://pixelgrid-ebd32-default-rtdb.firebaseio.com",
+      projectId: "pixelgrid-ebd32",
+      storageBucket: "pixelgrid-ebd32.firebasestorage.app",
+      messagingSenderId: "137062804380",
+      appId: "1:137062804380:web:e2b42f18b2dd51170d7659",
+      measurementId: "G-82E388FSSE"
+    };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
