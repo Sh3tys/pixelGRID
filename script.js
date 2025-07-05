@@ -94,35 +94,49 @@ for (let y = 0; y < rows; y++) {
       const lastPaint = localStorage.getItem("lastPaintTimestamp");
       const now = Date.now();
 
-      // Récupérer les données actuelles pour afficher le propriétaire actuel
       cellRef.once("value").then((snapshot) => {
         const data = snapshot.val();
 
         if (data && data.color && data.user) {
-          alert(`Ce pixel est actuellement colorié en "${data.color}" par ${data.user}.`);
+          // Popup info pixel colorié
+          alert(
+            `Le pixel appartient à :\n` +
+            `Prénom : ${data.user}\n` +
+            `Couleur : ${data.color}`
+          );
+
+          // Bloquer recoloration si cooldown actif (silencieux)
+          if (lastPaint && now - lastPaint < cooldown) {
+            return;
+          }
+
+          // Proposer recoloration
+          const newColor = prompt("Quelle couleur veux-tu mettre ? (ex: red, #00FF00, rgb(0,0,255))");
+          if (newColor) {
+            cellRef.set({
+              color: newColor,
+              user: username
+            });
+            localStorage.setItem("lastPaintTimestamp", now);
+            updateCooldownDisplay();
+          }
+
         } else {
-          alert("Ce pixel est actuellement blanc (non colorié).");
-        }
+          // Pixel blanc, pas de popup, mais cooldown silencieux
+          if (lastPaint && now - lastPaint < cooldown) {
+            return;
+          }
 
-        // Vérifier cooldown et proposer recolorage uniquement si cooldown terminé
-        if (lastPaint && now - lastPaint < cooldown) {
-          const wait = Math.ceil((cooldown - (now - lastPaint)) / 1000);
-          alert(`Merci d'attendre ${wait} secondes avant de recolorer un pixel.`);
-          return;
-        }
-
-        // Demander nouvelle couleur
-        const newColor = prompt("Quelle couleur veux-tu mettre ? (ex: red, #00FF00, rgb(0,0,255))");
-
-        if (newColor) {
-          // Enregistrer dans Firebase
-          cellRef.set({
-            color: newColor,
-            user: username
-          });
-          // Mettre à jour cooldown localStorage
-          localStorage.setItem("lastPaintTimestamp", now);
-          updateCooldownDisplay(); // mise à jour immédiate du timer
+          // Proposer coloration
+          const newColor = prompt("Ce pixel est blanc. Quelle couleur veux-tu mettre ?");
+          if (newColor) {
+            cellRef.set({
+              color: newColor,
+              user: username
+            });
+            localStorage.setItem("lastPaintTimestamp", now);
+            updateCooldownDisplay();
+          }
         }
       });
     });
