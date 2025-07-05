@@ -1,39 +1,29 @@
-body {
-  display: flex;
-  flex-direction: column;   /* Colonne : titre en haut, grille en dessous */
-  align-items: center;      /* Centre horizontalement les enfants */
-  height: 100vh;
-  margin: 0;
-  user-select: none;
-  padding-top: 20px;        /* Petit espace en haut */
+* {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-h1 {
-  margin: 0 0 20px 0;       /* Marge sous le titre pour espacer */
-}
-
-#grid {
-  border: 1px solid #000;
-  user-select: none;
-  /* Pour que la grille soit centrée horizontalement, align-items sur body suffit */
-}
-
-.row {
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f8f8f8;
   display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem;
 }
 
-.cell {
-  width: 10px;
-  height: 10px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  background-color: white;
-  transition: background-color 0.3s;
-}
-
-.cell:hover {
-  opacity: 0.7;
+/* Top bar avec input */
+#top-bar {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
 }
 
 #user-container {
@@ -43,7 +33,7 @@ h1 {
   background: #eee;
   padding: 8px 12px;
   border-radius: 4px;
-  box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
   user-select: none;
   z-index: 1000;
 }
@@ -52,4 +42,64 @@ h1 {
   padding: 4px 6px;
   font-size: 14px;
   width: 120px;
+}
+
+#cooldown-timer {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Grille wrapper scrollable */
+.grid-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+}
+
+/* Grille centrée */
+#grid {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Ligne de cellules */
+.row {
+  display: flex;
+}
+
+/* Cellule */
+.cell {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #ddd;
+  background-color: white;
+  transition: background-color 0.2s ease;
+}
+
+/* Popup stylé (si tu en veux un custom plus tard) */
+.popup {
+  background-color: #fff;
+  border: 1px solid #333;
+  padding: 1rem;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+/* Footer */
+footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #666;
+  padding: 1rem;
 }

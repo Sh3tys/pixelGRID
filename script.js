@@ -6,7 +6,7 @@ const firebaseConfig = {
   projectId: "pixelgrid-ebd32",
   storageBucket: "pixelgrid-ebd32.appspot.com",
   messagingSenderId: "137062804380",
-  appId: "1:137062804380:web:e2b42f18b2dd51170d7659"
+  appId: "1:137062804380:web:e2b42f18b2dd51170d7659",
 };
 
 // Initialiser Firebase
@@ -19,7 +19,7 @@ const cooldownTimerElement = document.getElementById("cooldown-timer");
 
 const cols = 120;
 const rows = 55;
-const cooldown = 5 * 60 * 1000; // 5 minutes en ms
+const cooldown = 1 * 60 * 1000; // 1 minutes en ms
 
 // Charger le prénom depuis localStorage si existant
 if (localStorage.getItem("username")) {
@@ -101,8 +101,8 @@ for (let y = 0; y < rows; y++) {
           // Popup info pixel colorié
           alert(
             `Le pixel appartient à :\n` +
-            `Prénom : ${data.user}\n` +
-            `Couleur : ${data.color}`
+              `Prénom : ${data.user}\n` +
+              `Couleur : ${data.color}`
           );
 
           // Bloquer recoloration si cooldown actif (silencieux)
@@ -111,16 +111,17 @@ for (let y = 0; y < rows; y++) {
           }
 
           // Proposer recoloration
-          const newColor = prompt("Quelle couleur veux-tu mettre ? (ex: red, #00FF00, rgb(0,0,255))");
+          const newColor = prompt(
+            "Quelle couleur veux-tu mettre ? (ex: red, #00FF00, rgb(0,0,255))"
+          );
           if (newColor) {
             cellRef.set({
               color: newColor,
-              user: username
+              user: username,
             });
             localStorage.setItem("lastPaintTimestamp", now);
             updateCooldownDisplay();
           }
-
         } else {
           // Pixel blanc, pas de popup, mais cooldown silencieux
           if (lastPaint && now - lastPaint < cooldown) {
@@ -128,11 +129,13 @@ for (let y = 0; y < rows; y++) {
           }
 
           // Proposer coloration
-          const newColor = prompt("Quelle couleur (en anglais) veux-tu mettre ?");
+          const newColor = prompt(
+            "Quelle couleur (en anglais) veux-tu mettre ?"
+          );
           if (newColor) {
             cellRef.set({
               color: newColor,
-              user: username
+              user: username,
             });
             localStorage.setItem("lastPaintTimestamp", now);
             updateCooldownDisplay();
