@@ -128,7 +128,7 @@ for (let y = 0; y < rows; y++) {
           }
 
           // Proposer coloration
-          const newColor = prompt("Ce pixel est blanc. Quelle couleur veux-tu mettre ?");
+          const newColor = prompt("Quelle couleur (en anglais) veux-tu mettre ?");
           if (newColor) {
             cellRef.set({
               color: newColor,
